@@ -7,6 +7,10 @@ export const DELETE_COURSE_REQUEST = 'DELETE_COURSE_REQUEST';
 export const DELETE_COURSE_SUCCESS = 'DELETE_COURSE_SUCCESS';
 export const DELETE_COURSE_FAILURE = 'DELETE_COURSE_FAILURE';
 
+export const ADD_COURSE_REQUEST = 'ADD_COURSE_REQUEST';
+export const ADD_COURSE_SUCCESS = 'ADD_COURSE_SUCCESS';
+export const ADD_COURSE_FAILURE = 'ADD_COURSE_FAILURE';
+
 export const fetchCoursesRequest = () => ({ type: FETCH_COURSES_REQUEST });
 export const fetchCoursesSuccess = (data) => ({
   type: FETCH_COURSES_SUCCESS,
@@ -29,5 +33,20 @@ export const deleteCourseSuccess = (id) => ({
 
 export const deleteCourseFailure = (error) => ({
   type: DELETE_COURSE_FAILURE,
+  payload: error,
+});
+
+export const addCourseRequest = (course) => ({
+  type: ADD_COURSE_REQUEST,
+  payload: course,
+});
+
+export const addCourseSuccess = (course) => ({
+  type: ADD_COURSE_SUCCESS,
+  payload: course,
+});
+
+export const addCourseFailure = (error) => ({
+  type: ADD_COURSE_FAILURE,
   payload: error,
 });

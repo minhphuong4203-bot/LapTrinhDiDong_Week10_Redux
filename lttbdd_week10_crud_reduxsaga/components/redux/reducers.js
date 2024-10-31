@@ -3,14 +3,13 @@ import {
   FETCH_COURSES_REQUEST,
   FETCH_COURSES_SUCCESS,
   FETCH_COURSES_FAILURE,
-  DELETE_COURSE_REQUEST,
   DELETE_COURSE_SUCCESS,
-  DELETE_COURSE_FAILURE,
+  ADD_COURSE_SUCCESS,
 } from './actions';
 
 const initialState = {
   courses: [],
-  loading: false, // Chỉ sử dụng để tải khóa học
+  loading: false,
   error: null,
 };
 
@@ -27,8 +26,11 @@ const courseReducer = (state = initialState, action) => {
         ...state,
         courses: state.courses.filter(course => course.id !== action.payload),
       };
-    case DELETE_COURSE_FAILURE:
-      return { ...state, error: action.payload }; // Giữ lại lỗi nếu có
+    case ADD_COURSE_SUCCESS:
+      return {
+        ...state,
+        courses: [...state.courses, action.payload],
+      };
     default:
       return state;
   }

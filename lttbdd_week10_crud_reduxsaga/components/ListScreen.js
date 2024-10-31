@@ -7,8 +7,6 @@ import Icon from 'react-native-vector-icons/FontAwesome';
 const ListScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { courses, loading, error } = useSelector((state) => state.courses);
-
-  // State để quản lý checkbox đã chọn
   const [selectedCourses, setSelectedCourses] = useState({});
 
   useEffect(() => {
@@ -16,18 +14,18 @@ const ListScreen = ({ navigation }) => {
   }, [dispatch]);
 
   const handleDelete = (id) => {
-    // Gọi action xóa khóa học mà không cần xác nhận
-    dispatch(deleteCourseRequest(id));
+    dispatch(deleteCourseRequest(id)); // Xóa khóa học
   };
 
   const toggleCheckbox = (id) => {
     setSelectedCourses((prev) => ({
       ...prev,
-      [id]: !prev[id], // Đổi trạng thái của checkbox
+      [id]: !prev[id],
     }));
   };
 
-  if (loading) return <Text>Loading...</Text>;
+  if (loading) return <Text>Loading courses...</Text>;
+
   if (error) return <Text>Error: {error}</Text>;
 
   return (
@@ -55,16 +53,17 @@ const ListScreen = ({ navigation }) => {
             item={item}
             navigation={navigation}
             onDelete={handleDelete}
-            isSelected={!!selectedCourses[item.id]} // Kiểm tra xem có được chọn không
-            onToggleCheckbox={toggleCheckbox} // Gửi hàm toggle checkbox
+            isSelected={!!selectedCourses[item.id]}
+            onToggleCheckbox={toggleCheckbox}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 80 }}
+        style={{ maxHeight: 520 }} // Giới hạn chiều cao của FlatList
       />
       <TouchableOpacity
         style={styles.addButton}
-        onPress={() => navigation.navigate('Add', { userName: 'User' })}
+        onPress={() => navigation.navigate('Add')}
       >
         <Text style={styles.addButtonText}>+</Text>
       </TouchableOpacity>
@@ -187,6 +186,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
+    position: 'absolute', // Đặt vị trí tuyệt đối để nút "+" không bị đẩy xuống
+    bottom: 20, // Cách đáy màn hình
+    alignSelf: 'center', // Căn giữa nút "+"
   },
   addButtonText: {
     fontSize: 30,
