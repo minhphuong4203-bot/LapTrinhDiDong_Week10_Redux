@@ -1,25 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput,CheckBox } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput, CheckBox } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
 import { deleteCourse } from './slice';
 import Icon from 'react-native-vector-icons/FontAwesome';
-// import CheckBox from '@react-native-community/checkbox';
 
 const ListScreen = ({ navigation }) => {
   const courses = useSelector((state) => state.courses);
   const dispatch = useDispatch();
-  const [selectedCourses, setSelectedCourses] = useState(courses.map(course => course.id)); // Default to all checked
 
   const handleDelete = (id) => {
     dispatch(deleteCourse(id));
-  };
-
-  const handleCheckboxPress = (id) => {
-    if (selectedCourses.includes(id)) {
-      setSelectedCourses(selectedCourses.filter((courseId) => courseId !== id));
-    } else {
-      setSelectedCourses([...selectedCourses, id]);
-    }
   };
 
   return (
@@ -47,8 +37,6 @@ const ListScreen = ({ navigation }) => {
             item={item}
             navigation={navigation}
             onDelete={handleDelete}
-            onCheckboxPress={handleCheckboxPress}
-            isSelected={selectedCourses.includes(item.id)}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
@@ -64,12 +52,12 @@ const ListScreen = ({ navigation }) => {
   );
 };
 
-const Item = ({ item, navigation, onDelete, onCheckboxPress, isSelected }) => (
+const Item = ({ item, navigation, onDelete }) => (
   <View style={styles.item}>
     <View style={styles.itemContent}>
       <CheckBox
-        value={isSelected}
-        onValueChange={() => onCheckboxPress(item.id)}
+        value={false} // Assuming checkboxes are not needed for deleting
+        disabled={true} // Disable the checkbox
         tintColors={{ true: '#00BFFF', false: '#A9A9A9' }}
         style={styles.checkbox}
       />
