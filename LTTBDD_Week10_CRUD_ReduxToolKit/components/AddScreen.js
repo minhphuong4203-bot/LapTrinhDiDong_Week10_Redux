@@ -1,5 +1,4 @@
-// components/AddScreen.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   TextInput,
@@ -10,11 +9,18 @@ import {
   Image,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { addCourse } from './slice'; // Import the thunk
+import { addCourse, updateCourse } from './slice'; // Import cả hai thunks
 
-const AddScreen = ({ navigation }) => {
+const AddScreen = ({ navigation, route }) => {
   const [jobTitle, setJobTitle] = useState('');
   const dispatch = useDispatch();
+  const { course } = route.params || {}; // Nhận thông tin sản phẩm từ params
+
+  useEffect(() => {
+    if (course) {
+      setJobTitle(course.title); // Đặt tiêu đề nếu có sản phẩm
+    }
+  }, [course]);
 
   const handleFinish = async () => {
     if (!jobTitle) {
@@ -23,19 +29,26 @@ const AddScreen = ({ navigation }) => {
     }
 
     try {
-      await dispatch(addCourse(jobTitle)); // Dispatch the thunk
-      Alert.alert('Course added successfully!');
+      if (course) {
+        // Cập nhật sản phẩm
+        await dispatch(updateCourse({ id: course.id, title: jobTitle })); // Dispatch update thunk
+        Alert.alert('Course updated successfully!');
+      } else {
+        // Thêm sản phẩm mới
+        await dispatch(addCourse(jobTitle)); // Dispatch the thunk
+        Alert.alert('Course added successfully!');
+      }
       setJobTitle(''); // Clear the input field
       navigation.goBack(); // Navigate back to the previous screen
     } catch (error) {
       console.error(error);
-      Alert.alert('Error adding course');
+      Alert.alert('Error adding/updating course');
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ADD YOUR JOB</Text>
+      <Text style={styles.title}>{course ? 'UPDATE YOUR JOB' : 'ADD YOUR JOB'}</Text>
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.inputField}
@@ -46,10 +59,10 @@ const AddScreen = ({ navigation }) => {
         />
       </View>
       <TouchableOpacity style={styles.finishButton} onPress={handleFinish}>
-        <Text style={styles.finishButtonText}>FINISH ➔</Text>
+        <Text style={styles.finishButtonText}>{course ? 'UPDATE ➔' : 'FINISH ➔'}</Text>
       </TouchableOpacity>
       <Image
-        source={require('../assets/images/bookAndPencil.png')} // Adjust the path as necessary
+        source={require('../assets/images/bookAndPencil.png')} // Điều chỉnh đường dẫn nếu cần
         style={styles.image}
       />
     </View>
@@ -68,8 +81,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   image: {
-    width: 200,  // Adjust width as needed
-    height: 200, // Adjust height as needed
+    width: 200,  // Điều chỉnh chiều rộng nếu cần
+    height: 200, // Điều chỉnh chiều cao nếu cần
     marginTop: 100,
   },
   inputWrapper: {
