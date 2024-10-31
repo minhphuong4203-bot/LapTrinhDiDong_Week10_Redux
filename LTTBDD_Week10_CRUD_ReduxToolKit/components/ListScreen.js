@@ -1,40 +1,90 @@
-// ListScreen.js
-import React, { useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet,TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput,CheckBox } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCourses } from './courseSlice';
+import { deleteCourse } from './slice';
 import Icon from 'react-native-vector-icons/FontAwesome';
+// import CheckBox from '@react-native-community/checkbox';
 
-const ListScreen = ({ route }) => {
+const ListScreen = ({ navigation }) => {
+  const courses = useSelector((state) => state.courses);
   const dispatch = useDispatch();
-  const { userName } = route.params;
-  const { courses, loading, error } = useSelector((state) => state.courses);
+  const [selectedCourses, setSelectedCourses] = useState(courses.map(course => course.id)); // Default to all checked
 
-  useEffect(() => {
-    dispatch(fetchCourses());
-  }, [dispatch]);
+  const handleDelete = (id) => {
+    dispatch(deleteCourse(id));
+  };
 
-  if (loading) return <ActivityIndicator size="large" color="#00BFFF" />;
-  if (error) return <Text>Error: {error}</Text>;
+  const handleCheckboxPress = (id) => {
+    if (selectedCourses.includes(id)) {
+      setSelectedCourses(selectedCourses.filter((courseId) => courseId !== id));
+    } else {
+      setSelectedCourses([...selectedCourses, id]);
+    }
+  };
 
   return (
     <View style={styles.listContainer}>
-      <Text style={styles.headerText}>Hi {userName}</Text>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-left" size={20} color="#000" />
+        </TouchableOpacity>
+        <View style={styles.userInfoContainer}>
+          <Icon name="user" size={24} color="#000" style={styles.logo} />
+          <View>
+            <Text style={styles.headerText}>Hi User</Text>
+            <Text style={styles.subHeaderText}>Have a great day ahead</Text>
+          </View>
+        </View>
+      </View>
+      <View style={styles.searchContainer}>
+        <Icon name="search" size={20} color="#A9A9A9" style={styles.searchIcon} />
+        <TextInput style={styles.searchInput} placeholder="Search" placeholderTextColor="#A9A9A9" />
+      </View>
       <FlatList
         data={courses}
         renderItem={({ item }) => (
-          <View style={styles.item}>
-            <Text style={styles.titleItem}>{item.title}</Text>
-            <TouchableOpacity>
-              <Icon name="pencil" size={14} color="red" />
-            </TouchableOpacity>
-          </View>
+          <Item
+            item={item}
+            navigation={navigation}
+            onDelete={handleDelete}
+            onCheckboxPress={handleCheckboxPress}
+            isSelected={selectedCourses.includes(item.id)}
+          />
         )}
         keyExtractor={(item) => item.id.toString()}
+        contentContainerStyle={{ paddingBottom: 80 }}
       />
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => navigation.navigate('Add', { userName: 'User' })}
+      >
+        <Text style={styles.addButtonText}>+</Text>
+      </TouchableOpacity>
     </View>
   );
 };
+
+const Item = ({ item, navigation, onDelete, onCheckboxPress, isSelected }) => (
+  <View style={styles.item}>
+    <View style={styles.itemContent}>
+      <CheckBox
+        value={isSelected}
+        onValueChange={() => onCheckboxPress(item.id)}
+        tintColors={{ true: '#00BFFF', false: '#A9A9A9' }}
+        style={styles.checkbox}
+      />
+      <Text style={styles.titleItem}>{item.title}</Text>
+    </View>
+    <View style={{ flexDirection: 'row' }}>
+      <TouchableOpacity onPress={() => navigation.navigate('Add', { course: item })}>
+        <Icon name="pencil" size={20} color="red" />
+      </TouchableOpacity>
+      <TouchableOpacity onPress={() => onDelete(item.id)} style={{ marginLeft: 10 }}>
+        <Icon name="times" size={20} color="red" />
+      </TouchableOpacity>
+    </View>
+  </View>
+);
 
 const styles = StyleSheet.create({
   listContainer: {
@@ -42,11 +92,44 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#FFFFFF',
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  userInfoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   headerText: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#000',
+    marginLeft: 10,
+  },
+  logo: {
+    marginRight: 10,
+  },
+  subHeaderText: {
+    fontSize: 16,
+    color: '#000',
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 5,
+    borderColor: '#9095A0',
     marginBottom: 20,
+    paddingHorizontal: 10,
+  },
+  searchIcon: {
+    marginRight: 10,
+  },
+  searchInput: {
+    height: 40,
+    flex: 1,
+    color: '#000',
   },
   item: {
     flexDirection: 'row',
@@ -57,10 +140,33 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     padding: 15,
     marginBottom: 10,
+    backgroundColor: '#F9F9F9',
+  },
+  itemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   titleItem: {
-    fontSize: 16,
+    fontSize: 18,
     color: '#333',
+  },
+  checkbox: {
+    marginRight: 10,
+  },
+  addButton: {
+    left: '50%',
+    marginLeft: -30,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: '#00BFFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 5,
+  },
+  addButtonText: {
+    fontSize: 30,
+    color: '#FFFFFF',
   },
 });
 

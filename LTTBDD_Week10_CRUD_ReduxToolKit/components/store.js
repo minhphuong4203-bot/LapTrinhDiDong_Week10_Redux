@@ -1,6 +1,6 @@
-// store.js
+// redux/store.js
 import { configureStore } from '@reduxjs/toolkit';
-import courseReducer from './courseSlice';
+import courseReducer from './slice';
 
 const store = configureStore({
   reducer: {
