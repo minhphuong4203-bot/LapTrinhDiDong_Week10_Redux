@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { addCourseRequest } from './redux/actions';
+import { addCourseRequest, updateCourseRequest } from './redux/actions';
 
 const AddScreen = ({ navigation, route }) => {
   const { course, isUpdate } = route.params || {};
@@ -28,7 +28,12 @@ const AddScreen = ({ navigation, route }) => {
       return;
     }
 
-    dispatch(addCourseRequest({ id: course?.id, title: jobTitle }));
+    if (isUpdate) {
+      dispatch(updateCourseRequest({ id: course.id, title: jobTitle }));
+    } else {
+      dispatch(addCourseRequest({ title: jobTitle }));
+    }
+
     Alert.alert(isUpdate ? 'Course updated successfully!' : 'Course added successfully!');
     setJobTitle('');
     navigation.goBack();
@@ -65,27 +70,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   inputWrapper: {
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: '#9095A0',
     width: '100%',
     marginBottom: 20,
-    paddingHorizontal: 10,
   },
   inputField: {
-    height: 40,
+    borderWidth: 1,
+    borderColor: '#9095A0',
+    borderRadius: 8,
+    padding: 10,
+    width: '100%',
   },
   finishButton: {
-    backgroundColor: '#00BFFF',
-    borderRadius: 5,
-    paddingVertical: 15,
-    paddingHorizontal: 30,
+    backgroundColor: '#007BFF',
+    padding: 15,
+    borderRadius: 8,
     alignItems: 'center',
-    justifyContent: 'center',
   },
   finishButtonText: {
     color: '#FFFFFF',
-    fontSize: 16,
+    fontSize: 18,
   },
 });
 

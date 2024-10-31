@@ -1,6 +1,6 @@
 // rootReducer.js
 import { combineReducers } from 'redux';
-import courseReducer from './reducers'; // Đảm bảo đường dẫn đúng
+import courseReducer from './reducers';
 
 const rootReducer = combineReducers({
   courses: courseReducer,
