@@ -27,9 +27,15 @@ const courseReducer = (state = initialState, action) => {
         courses: state.courses.filter(course => course.id !== action.payload),
       };
     case ADD_COURSE_SUCCESS:
+      // Kiểm tra xem có ID không, nếu có thì cập nhật, nếu không thì thêm mới
+      const existingCourse = state.courses.find(course => course.id === action.payload.id);
       return {
         ...state,
-        courses: [...state.courses, action.payload],
+        courses: existingCourse
+          ? state.courses.map(course =>
+              course.id === action.payload.id ? action.payload : course
+            )
+          : [...state.courses, action.payload],
       };
     default:
       return state;

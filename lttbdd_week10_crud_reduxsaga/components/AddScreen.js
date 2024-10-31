@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+// AddScreen.js
+import React, { useEffect, useState } from 'react';
 import {
   View,
   TextInput,
@@ -6,14 +7,20 @@ import {
   Text,
   StyleSheet,
   Alert,
-  Image,
 } from 'react-native';
 import { useDispatch } from 'react-redux';
-import { addCourseRequest } from './redux/actions'; // Import action để thêm khóa học
+import { addCourseRequest } from './redux/actions';
 
-const AddScreen = ({ navigation }) => {
+const AddScreen = ({ navigation, route }) => {
+  const { course, isUpdate } = route.params || {};
   const [jobTitle, setJobTitle] = useState('');
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (isUpdate && course) {
+      setJobTitle(course.title);
+    }
+  }, [isUpdate, course]);
 
   const handleFinish = () => {
     if (!jobTitle) {
@@ -21,16 +28,15 @@ const AddScreen = ({ navigation }) => {
       return;
     }
 
-    // Gọi action với đối tượng chứa title
-    dispatch(addCourseRequest({ title: jobTitle }));
-    Alert.alert('Course added successfully!');
-    setJobTitle(''); // Xóa trường nhập
-    navigation.goBack(); // Quay lại màn hình trước
+    dispatch(addCourseRequest({ id: course?.id, title: jobTitle }));
+    Alert.alert(isUpdate ? 'Course updated successfully!' : 'Course added successfully!');
+    setJobTitle('');
+    navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>ADD YOUR JOB</Text>
+      <Text style={styles.title}>{isUpdate ? 'UPDATE YOUR JOB' : 'ADD YOUR JOB'}</Text>
       <View style={styles.inputWrapper}>
         <TextInput
           style={styles.inputField}
@@ -43,10 +49,6 @@ const AddScreen = ({ navigation }) => {
       <TouchableOpacity style={styles.finishButton} onPress={handleFinish}>
         <Text style={styles.finishButtonText}>FINISH ➔</Text>
       </TouchableOpacity>
-      <Image
-        source={require('../assets/images/bookAndPencil.png')} // Điều chỉnh đường dẫn nếu cần
-        style={styles.image}
-      />
     </View>
   );
 };
@@ -61,11 +63,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     marginBottom: 20,
-  },
-  image: {
-    width: 200,
-    height: 200,
-    marginTop: 100,
   },
   inputWrapper: {
     borderWidth: 1,

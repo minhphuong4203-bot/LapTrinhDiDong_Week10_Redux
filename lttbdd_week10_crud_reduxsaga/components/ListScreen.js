@@ -1,31 +1,23 @@
-import React, { useEffect, useState } from 'react';
+// ListScreen.js
+import React, { useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCoursesRequest, deleteCourseRequest } from './redux/actions'; // Đảm bảo đường dẫn đúng
+import { fetchCoursesRequest, deleteCourseRequest } from './redux/actions';
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ListScreen = ({ navigation }) => {
   const dispatch = useDispatch();
   const { courses, loading, error } = useSelector((state) => state.courses);
-  const [selectedCourses, setSelectedCourses] = useState({});
 
   useEffect(() => {
     dispatch(fetchCoursesRequest());
   }, [dispatch]);
 
   const handleDelete = (id) => {
-    dispatch(deleteCourseRequest(id)); // Xóa khóa học
-  };
-
-  const toggleCheckbox = (id) => {
-    setSelectedCourses((prev) => ({
-      ...prev,
-      [id]: !prev[id],
-    }));
+    dispatch(deleteCourseRequest(id));
   };
 
   if (loading) return <Text>Loading courses...</Text>;
-
   if (error) return <Text>Error: {error}</Text>;
 
   return (
@@ -53,13 +45,11 @@ const ListScreen = ({ navigation }) => {
             item={item}
             navigation={navigation}
             onDelete={handleDelete}
-            isSelected={!!selectedCourses[item.id]}
-            onToggleCheckbox={toggleCheckbox}
           />
         )}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 80 }}
-        style={{ maxHeight: 520 }} // Giới hạn chiều cao của FlatList
+        style={{ maxHeight: 520 }}
       />
       <TouchableOpacity
         style={styles.addButton}
@@ -71,18 +61,11 @@ const ListScreen = ({ navigation }) => {
   );
 };
 
-const Item = ({ item, navigation, onDelete, isSelected, onToggleCheckbox }) => (
+const Item = ({ item, navigation, onDelete }) => (
   <View style={styles.item}>
-    <View style={styles.itemContent}>
-      <TouchableOpacity onPress={() => onToggleCheckbox(item.id)} style={styles.checkboxContainer}>
-        <View style={[styles.checkbox, isSelected ? styles.checked : styles.unchecked]}>
-          {isSelected && <Icon name="check" size={15} color="#FFFFFF" />}
-        </View>
-      </TouchableOpacity>
-      <Text style={styles.titleItem}>{item.title}</Text>
-    </View>
+    <Text style={styles.titleItem}>{item.title}</Text>
     <View style={{ flexDirection: 'row' }}>
-      <TouchableOpacity onPress={() => navigation.navigate('Edit', { course: item })}>
+      <TouchableOpacity onPress={() => navigation.navigate('Add', { course: item, isUpdate: true })}>
         <Icon name="pencil" size={20} color="red" />
       </TouchableOpacity>
       <TouchableOpacity onPress={() => onDelete(item.id)} style={{ marginLeft: 10 }}>
@@ -148,33 +131,9 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     backgroundColor: '#F9F9F9',
   },
-  itemContent: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   titleItem: {
     fontSize: 18,
     color: '#333',
-    marginLeft: 10,
-  },
-  checkboxContainer: {
-    marginRight: 10,
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    borderWidth: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  unchecked: {
-    borderColor: '#00FF00', // Màu viền xanh lá cây khi không được chọn
-    backgroundColor: '#FFFFFF',
-  },
-  checked: {
-    borderColor: '#00BFFF', // Màu viền xanh lam khi được chọn
-    backgroundColor: '#00BFFF', // Màu nền khi chọn
   },
   addButton: {
     left: '50%',
@@ -186,9 +145,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 5,
-    position: 'absolute', // Đặt vị trí tuyệt đối để nút "+" không bị đẩy xuống
-    bottom: 20, // Cách đáy màn hình
-    alignSelf: 'center', // Căn giữa nút "+"
+    position: 'absolute',
+    bottom: 20,
+    alignSelf: 'center',
   },
   addButtonText: {
     fontSize: 30,

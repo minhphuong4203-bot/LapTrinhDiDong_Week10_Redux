@@ -41,12 +41,13 @@ function* deleteCourseSaga(action) {
 
 function* addCourseSaga(action) {
   try {
-    const response = yield call(fetch, 'https://66fe07bc699369308956d365.mockapi.io/course', {
-      method: 'POST',
+    const method = action.payload.id ? 'PUT' : 'POST';
+    const response = yield call(fetch, `https://66fe07bc699369308956d365.mockapi.io/course${action.payload.id ? `/${action.payload.id}` : ''}`, {
+      method,
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(action.payload),
+      body: JSON.stringify({ title: action.payload.title }),
     });
     if (!response.ok) {
       throw new Error('Network response was not ok');
