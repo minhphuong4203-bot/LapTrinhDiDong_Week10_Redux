@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 import { useSelector, useDispatch } from 'react-redux';
-import { fetchCoursesRequest, deleteCourse } from './redux/actions'; // Đường dẫn đến actions
+import { fetchCoursesRequest, deleteCourseRequest } from './redux/actions'; // Đảm bảo đường dẫn đúng
 import Icon from 'react-native-vector-icons/FontAwesome';
 
 const ListScreen = ({ navigation }) => {
@@ -16,7 +16,8 @@ const ListScreen = ({ navigation }) => {
   }, [dispatch]);
 
   const handleDelete = (id) => {
-    dispatch(deleteCourse(id)); // Thực hiện xóa khóa học
+    // Gọi action xóa khóa học mà không cần xác nhận
+    dispatch(deleteCourseRequest(id));
   };
 
   const toggleCheckbox = (id) => {
@@ -76,7 +77,7 @@ const Item = ({ item, navigation, onDelete, isSelected, onToggleCheckbox }) => (
     <View style={styles.itemContent}>
       <TouchableOpacity onPress={() => onToggleCheckbox(item.id)} style={styles.checkboxContainer}>
         <View style={[styles.checkbox, isSelected ? styles.checked : styles.unchecked]}>
-          {isSelected && <Icon name="check" size={15} color="#FFFFFF" />} {/* Hiển thị dấu check khi được chọn */}
+          {isSelected && <Icon name="check" size={15} color="#FFFFFF" />}
         </View>
       </TouchableOpacity>
       <Text style={styles.titleItem}>{item.title}</Text>
